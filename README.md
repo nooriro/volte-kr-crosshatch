@@ -47,11 +47,11 @@ After VoLTE activation, you may uninstall Magisk. Without Magisk you can still u
 
 2. Do OTA __system updates completely__, including reboot system.
 
-3. After system updates, __flash “radio-180917”__ (`radio-crosshatch-g845-00023-180917-b-5014671.img`) __again__ via fastboot mode. (See above [Prerequisite](https://github.com/Magisk-Modules-Repo/volte-kr-crosshatch#prerequisite))
+3. After system updates, __flash “radio-180917”__ (`radio-crosshatch-g845-00023-180917-b-5014671.img`) __again__ via fastboot mode. (See above [Prerequisite](https://github.com/Magisk-Modules-Repo/volte-kr-crosshatch/blob/master/README.md#prerequisite))
 
 4. __Test VoLTE__ call and SMS.
 
-5. If VoLTE is not working correctly, __re-activate VoLTE with Magisk and this module__. (See above [VoLTE Activation](https://github.com/Magisk-Modules-Repo/volte-kr-crosshatch#volte-activation).)
+5. If VoLTE is not working correctly, __re-activate VoLTE with Magisk and this module__. (See above [VoLTE Activation](https://github.com/Magisk-Modules-Repo/volte-kr-crosshatch/blob/master/README.md#volte-activation).)
 
 
 ## Known Issues
@@ -66,7 +66,7 @@ If you have an __LGU__ SIM card, you can bypass this problem by __sandwitching__
 * ⋯ > SKT (VoLTE) > KT (CSFB to 3G) > ⋯
 * ⋯ > __SKT (VoLTE)__ > `LGU (VoLTE)` > __KT (VoLTE)__ > ⋯
 
-Otherwise, __re-activate VoLTE using Magisk and this module__ with proper SIM card inserted. (See above [VoLTE Activation](https://github.com/Magisk-Modules-Repo/volte-kr-crosshatch#volte-activation).)
+Otherwise, __re-activate VoLTE using Magisk and this module__ with proper SIM card inserted. (See above [VoLTE Activation](https://github.com/Magisk-Modules-Repo/volte-kr-crosshatch/blob/master/README.md#volte-activation).)
 
 
 ## VoLTE Deactivation
