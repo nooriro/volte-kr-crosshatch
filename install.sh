@@ -25,7 +25,7 @@
 SKIPMOUNT=false
 
 # Set to true if you need to load system.prop
-PROPFILE=false
+PROPFILE=true
 
 # Set to true if you need post-fs-data script
 POSTFSDATA=false
@@ -122,9 +122,16 @@ REPLACE="
 # Set what you want to display when installing your module
 
 print_modname() {
-  ui_print "*******************************"
-  ui_print "     Magisk Module Template    "
-  ui_print "*******************************"
+  ui_print "+----------------------------+"
+  ui_print "|                            |"
+  ui_print "|           VoLTE            |"
+  ui_print "|           in KR            |"
+  ui_print "|       for Pixel 3/XL       |"
+  ui_print "|                            |"
+  ui_print "|       v1.00-20190601       |"
+  ui_print "|         by nooriro         |"
+  ui_print "|                            |"
+  ui_print "+----------------------------+"
 }
 
 # Copy/extract your module files into $MODPATH in on_install.
@@ -132,8 +139,33 @@ print_modname() {
 on_install() {
   # The following is the default implementation: extract $ZIPFILE/system to $MODPATH
   # Extend/change the logic to whatever you want
-  ui_print "- Extracting module files"
+  
+  MANUFACTURER="$(grep_prop ro.product.manufacturer)"
+  MODEL="$(grep_prop ro.product.model)"
+  DEVICE="$(grep_prop ro.product.device)"
+  ui_print "- Device: $DEVICE ($MANUFACTURER $MODEL)"
+  
+  if [ "$DEVICE" = "blueline" ] || [ "$DEVICE" = "crosshatch" ]; then
+    ui_print "- Eligible device for install"
+  else
+    abort "! This module is only for Pixel 3 / Pixel 3 XL"
+  fi
+  
+  ui_print "- Extracting mcfg_sw.mbn files"
   unzip -o "$ZIPFILE" 'system/*' -d $MODPATH >&2
+  
+  ui_print "- Getting current mbn_sw.txt from /vendor"
+  cp /vendor/rfs/msm/mpss/readonly/vendor/mbn/mcfg_sw/mbn_sw.txt $MODPATH/system/vendor/rfs/msm/mpss/readonly/vendor/mbn/mcfg_sw/mbn_sw.txt
+  
+  ui_print "- Adding mcfg_sw.mbn paths to mbn_sw.txt"
+  # If each mcfg_sw.mbn path does not exist in mbn_sw.txt, add the path at the end of mbn_sw.txt
+  grep -q mcfg_sw/generic/Korea2/SKT/Commercial/mcfg_sw.mbn $MODPATH/system/vendor/rfs/msm/mpss/readonly/vendor/mbn/mcfg_sw/mbn_sw.txt || echo mcfg_sw/generic/Korea2/SKT/Commercial/mcfg_sw.mbn >> $MODPATH/system/vendor/rfs/msm/mpss/readonly/vendor/mbn/mcfg_sw/mbn_sw.txt
+  grep -q mcfg_sw/generic/Korea2/KT/Commercial/mcfg_sw.mbn  $MODPATH/system/vendor/rfs/msm/mpss/readonly/vendor/mbn/mcfg_sw/mbn_sw.txt || echo mcfg_sw/generic/Korea2/KT/Commercial/mcfg_sw.mbn  >> $MODPATH/system/vendor/rfs/msm/mpss/readonly/vendor/mbn/mcfg_sw/mbn_sw.txt
+  grep -q mcfg_sw/generic/Korea2/LGU/Commercial/mcfg_sw.mbn $MODPATH/system/vendor/rfs/msm/mpss/readonly/vendor/mbn/mcfg_sw/mbn_sw.txt || echo mcfg_sw/generic/Korea2/LGU/Commercial/mcfg_sw.mbn >> $MODPATH/system/vendor/rfs/msm/mpss/readonly/vendor/mbn/mcfg_sw/mbn_sw.txt
+  
+  ui_print "- Removing /data/vendor/modem_fdr/fdr_check"
+  rm /data/vendor/modem_fdr/fdr_check
+  
 }
 
 # Only some special files require specific permissions
@@ -149,6 +181,19 @@ set_permissions() {
   # set_perm  $MODPATH/system/bin/app_process32   0     2000    0755      u:object_r:zygote_exec:s0
   # set_perm  $MODPATH/system/bin/dex2oat         0     2000    0755      u:object_r:dex2oat_exec:s0
   # set_perm  $MODPATH/system/lib/libart.so       0     0       0644
+  
+  # directory :   0   2000  0755   u:object_r:vendor_file:s0
+  # file      :   0   0     0644   u:object_r:vendor_file:s0
+  
+  # set_perm_recursive <directory> <owner> <group> <dirpermission> <filepermission> [context]
+  set_perm_recursive $MODPATH 0 2000 0755 0644 u:object_r:vendor_file:s0
+  
+  # set_perm <target> <owner> <group> <permission> [context]
+  set_perm $MODPATH/system/vendor/rfs/msm/mpss/readonly/vendor/mbn/mcfg_sw/mbn_sw.txt                                0 0 0644 u:object_r:vendor_file:s0
+  set_perm $MODPATH/system/vendor/rfs/msm/mpss/readonly/vendor/mbn/mcfg_sw/generic/Korea2/SKT/Commercial/mcfg_sw.mbn 0 0 0644 u:object_r:vendor_file:s0
+  set_perm $MODPATH/system/vendor/rfs/msm/mpss/readonly/vendor/mbn/mcfg_sw/generic/Korea2/KT/Commercial/mcfg_sw.mbn  0 0 0644 u:object_r:vendor_file:s0
+  set_perm $MODPATH/system/vendor/rfs/msm/mpss/readonly/vendor/mbn/mcfg_sw/generic/Korea2/LGU/Commercial/mcfg_sw.mbn 0 0 0644 u:object_r:vendor_file:s0
+  
 }
 
 # You can add more functions to assist your custom script code
