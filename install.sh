@@ -146,7 +146,7 @@ on_install() {
   ui_print "- Device: $DEVICE ($MANUFACTURER $MODEL)"
   
   if [ "$DEVICE" = "blueline" ] || [ "$DEVICE" = "crosshatch" ]; then
-    ui_print "- Eligible device for install"
+    ui_print "- Eligible device for installation"
   else
     abort "! This module is only for Pixel 3 / Pixel 3 XL"
   fi
