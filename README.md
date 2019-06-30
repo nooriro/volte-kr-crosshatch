@@ -79,6 +79,9 @@ Note that uninstalling only this module does not deactivate VoLTE on KR carriers
 
 ## Update History
 
+#### v1.01-20190630
+* Support device check on Android Q
+
 #### v1.00-20190601
 * First release
 * Source(s) of __carrier-specific modem configuration__ (`mcfg_sw.mbn`) files :

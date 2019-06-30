@@ -128,7 +128,7 @@ print_modname() {
   ui_print "|           in KR            |"
   ui_print "|       for Pixel 3/XL       |"
   ui_print "|                            |"
-  ui_print "|       v1.00-20190601       |"
+  ui_print "|       v1.01-20190630       |"
   ui_print "|         by nooriro         |"
   ui_print "|                            |"
   ui_print "+----------------------------+"
@@ -143,6 +143,9 @@ on_install() {
   MANUFACTURER="$(grep_prop ro.product.manufacturer)"
   MODEL="$(grep_prop ro.product.model)"
   DEVICE="$(grep_prop ro.product.device)"
+  [ -z "$MANUFACTURER" ] && MANUFACTURER="$(sed -n 's/^ro\.product\.vendor\.manufacturer=\(.*\)/\1/p' /vendor/build.prop)"
+  [ -z "$MODEL" ] && MODEL="$(sed -n 's/^ro\.product\.vendor\.model=\(.*\)/\1/p' /vendor/build.prop)"
+  [ -z "$DEVICE" ] && DEVICE="$(sed -n 's/^ro\.product\.vendor\.device=\(.*\)/\1/p' /vendor/build.prop)"
   ui_print "- Device: $DEVICE ($MANUFACTURER $MODEL)"
   
   if [ "$DEVICE" = "blueline" ] || [ "$DEVICE" = "crosshatch" ]; then
