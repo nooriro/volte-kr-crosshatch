@@ -79,6 +79,9 @@ Note that uninstalling only this module does not deactivate VoLTE on KR carriers
 
 ## Update History
 
+#### v1.02-20191218
+* Reduce code duplication and clean up
+
 #### v1.01-20190630
 * Support device check on Android Q
 
@@ -86,7 +89,7 @@ Note that uninstalling only this module does not deactivate VoLTE on KR carriers
 * First release
 * Source(s) of __carrier-specific modem configuration__ (`mcfg_sw.mbn`) files :
   * SKT, KT : [Razer Phone 2 - Global Factory Image](https://developer.razer.com/razer-phone-dev-tools/factory-images/) | [P-MR1-RC003-RZR-190305.3110](https://s3.amazonaws.com/cheryl-factory-images/aura-p-global-3110.zip)
-  * LGU : [Xiaomi Poco F1 - Global Stable ROM](https://en.miui.com/download-355.html) | [V10.3.4.0.PEJMIXM](http://bigota.d.miui.com/V10.3.4.0.PEJMIXM/miui_POCOF1Global_V10.3.4.0.PEJMIXM_13b169ae13_9.0.zip)
+  * LGU : [Xiaomi Poco F1 - Global Stable ROM](http://c.mi.com/oc/miuidownload/detail?device=1700355) | [V10.3.4.0.PEJMIXM](http://bigota.d.miui.com/V10.3.4.0.PEJMIXM/miui_POCOF1Global_V10.3.4.0.PEJMIXM_13b169ae13_9.0.zip)
 
 
 ## Acknowledgments

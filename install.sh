@@ -124,14 +124,25 @@ REPLACE="
 print_modname() {
   ui_print "+----------------------------+"
   ui_print "|                            |"
-  ui_print "|           VoLTE            |"
-  ui_print "|           in KR            |"
-  ui_print "|       for Pixel 3/XL       |"
+  ui_print "|         VoLTE in           |"
+  ui_print "|         K   R for          |"
+  ui_print "|         Pixel 3/XL         |"
   ui_print "|                            |"
-  ui_print "|       v1.01-20190630       |"
+  ui_print "|       v1.02-20191218       |"
   ui_print "|         by nooriro         |"
   ui_print "|                            |"
   ui_print "+----------------------------+"
+}
+
+# Some modification of grep_prop() in util_functions.sh
+# https://github.com/topjohnwu/Magisk/blob/v20.1/scripts/util_functions.sh#L46
+
+my_grep_prop() {
+  local REGEX="s/^$1=//p"
+  shift
+  local FILES=$@
+  [ -z "$FILES" ] && FILES='/system/build.prop /vendor/build.prop /product/build.prop'
+  sed -n "$REGEX" $FILES 2>/dev/null | head -n 1
 }
 
 # Copy/extract your module files into $MODPATH in on_install.
@@ -140,14 +151,25 @@ on_install() {
   # The following is the default implementation: extract $ZIPFILE/system to $MODPATH
   # Extend/change the logic to whatever you want
   
-  MANUFACTURER="$(grep_prop ro.product.manufacturer)"
-  MODEL="$(grep_prop ro.product.model)"
-  DEVICE="$(grep_prop ro.product.device)"
-  [ -z "$MANUFACTURER" ] && MANUFACTURER="$(sed -n 's/^ro\.product\.vendor\.manufacturer=\(.*\)/\1/p' /vendor/build.prop)"
-  [ -z "$MODEL" ] && MODEL="$(sed -n 's/^ro\.product\.vendor\.model=\(.*\)/\1/p' /vendor/build.prop)"
-  [ -z "$DEVICE" ] && DEVICE="$(sed -n 's/^ro\.product\.vendor\.device=\(.*\)/\1/p' /vendor/build.prop)"
-  ui_print "- Device: $DEVICE ($MANUFACTURER $MODEL)"
+  # Paths to 'mbn base directory', 'mbn list file', and 'mbn files'
+  local MBNDIR="/vendor/rfs/msm/mpss/readonly/vendor/mbn"
+  local LISTFILE="mcfg_sw/mbn_sw.txt"
+  local MBN_FILES="
+    mcfg_sw/generic/Korea2/SKT/Commercial/mcfg_sw.mbn
+    mcfg_sw/generic/Korea2/KT/Commercial/mcfg_sw.mbn
+    mcfg_sw/generic/Korea2/LGU/Commercial/mcfg_sw.mbn
+  "
   
+  # Get device information
+  local MANUFACTURER="$(my_grep_prop 'ro\.product\.manufacturer')"
+  local        MODEL="$(my_grep_prop 'ro\.product\.model'       )"
+  local       DEVICE="$(my_grep_prop 'ro\.product\.device'      )"
+  [ -z "$MANUFACTURER" ] && MANUFACTURER="$(my_grep_prop 'ro\.product\.vendor\.manufacturer')"
+  [ -z "$MODEL"        ] &&        MODEL="$(my_grep_prop 'ro\.product\.vendor\.model'       )"
+  [ -z "$DEVICE"       ] &&       DEVICE="$(my_grep_prop 'ro\.product\.vendor\.device'      )"
+  
+  # Check device eligibility for installation
+  ui_print "- Device: $DEVICE ($MANUFACTURER $MODEL)"
   if [ "$DEVICE" = "blueline" ] || [ "$DEVICE" = "crosshatch" ]; then
     ui_print "- Eligible device for installation"
   else
@@ -158,17 +180,19 @@ on_install() {
   unzip -o "$ZIPFILE" 'system/*' -d $MODPATH >&2
   
   ui_print "- Getting current mbn_sw.txt from /vendor"
-  cp /vendor/rfs/msm/mpss/readonly/vendor/mbn/mcfg_sw/mbn_sw.txt $MODPATH/system/vendor/rfs/msm/mpss/readonly/vendor/mbn/mcfg_sw/mbn_sw.txt
+  local MODPATH_LIST=$MODPATH/system$MBNDIR/$LISTFILE
+  cp $MBNDIR/$LISTFILE $MODPATH_LIST
   
   ui_print "- Adding mcfg_sw.mbn paths to mbn_sw.txt"
-  # If each mcfg_sw.mbn path does not exist in mbn_sw.txt, add the path at the end of mbn_sw.txt
-  grep -q mcfg_sw/generic/Korea2/SKT/Commercial/mcfg_sw.mbn $MODPATH/system/vendor/rfs/msm/mpss/readonly/vendor/mbn/mcfg_sw/mbn_sw.txt || echo mcfg_sw/generic/Korea2/SKT/Commercial/mcfg_sw.mbn >> $MODPATH/system/vendor/rfs/msm/mpss/readonly/vendor/mbn/mcfg_sw/mbn_sw.txt
-  grep -q mcfg_sw/generic/Korea2/KT/Commercial/mcfg_sw.mbn  $MODPATH/system/vendor/rfs/msm/mpss/readonly/vendor/mbn/mcfg_sw/mbn_sw.txt || echo mcfg_sw/generic/Korea2/KT/Commercial/mcfg_sw.mbn  >> $MODPATH/system/vendor/rfs/msm/mpss/readonly/vendor/mbn/mcfg_sw/mbn_sw.txt
-  grep -q mcfg_sw/generic/Korea2/LGU/Commercial/mcfg_sw.mbn $MODPATH/system/vendor/rfs/msm/mpss/readonly/vendor/mbn/mcfg_sw/mbn_sw.txt || echo mcfg_sw/generic/Korea2/LGU/Commercial/mcfg_sw.mbn >> $MODPATH/system/vendor/rfs/msm/mpss/readonly/vendor/mbn/mcfg_sw/mbn_sw.txt
+  # Add each path to mcfg_sw.mbn at the end of mbn_sw.txt
+  #     ONLY IF the path is NOT EXIST in mbn_sw.txt
+  local MBNFILE
+  for MBNFILE in $MBN_FILES; do
+    grep -q $MBNFILE $MODPATH_LIST || echo $MBNFILE >> $MODPATH_LIST
+  done
   
   ui_print "- Removing /data/vendor/modem_fdr/fdr_check"
   rm /data/vendor/modem_fdr/fdr_check
-  
 }
 
 # Only some special files require specific permissions
@@ -178,7 +202,7 @@ on_install() {
 set_permissions() {
   # The following is the default rule, DO NOT remove
   set_perm_recursive $MODPATH 0 0 0755 0644
-
+  
   # Here are some examples:
   # set_perm_recursive  $MODPATH/system/lib       0     0       0755      0644
   # set_perm  $MODPATH/system/bin/app_process32   0     2000    0755      u:object_r:zygote_exec:s0
@@ -192,11 +216,10 @@ set_permissions() {
   set_perm_recursive $MODPATH 0 2000 0755 0644 u:object_r:vendor_file:s0
   
   # set_perm <target> <owner> <group> <permission> [context]
-  set_perm $MODPATH/system/vendor/rfs/msm/mpss/readonly/vendor/mbn/mcfg_sw/mbn_sw.txt                                0 0 0644 u:object_r:vendor_file:s0
-  set_perm $MODPATH/system/vendor/rfs/msm/mpss/readonly/vendor/mbn/mcfg_sw/generic/Korea2/SKT/Commercial/mcfg_sw.mbn 0 0 0644 u:object_r:vendor_file:s0
-  set_perm $MODPATH/system/vendor/rfs/msm/mpss/readonly/vendor/mbn/mcfg_sw/generic/Korea2/KT/Commercial/mcfg_sw.mbn  0 0 0644 u:object_r:vendor_file:s0
-  set_perm $MODPATH/system/vendor/rfs/msm/mpss/readonly/vendor/mbn/mcfg_sw/generic/Korea2/LGU/Commercial/mcfg_sw.mbn 0 0 0644 u:object_r:vendor_file:s0
-  
+  local FILE
+  find $MODPATH -type f -o -type l 2>/dev/null | while read FILE; do
+    set_perm  $FILE  0  0  0644  u:object_r:vendor_file:s0
+  done
 }
 
 # You can add more functions to assist your custom script code
