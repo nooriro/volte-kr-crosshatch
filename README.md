@@ -79,6 +79,10 @@ Note that uninstalling only this module does not deactivate VoLTE on KR carriers
 
 ## Update History
 
+#### v1.03-20200214
+* Support Pixel 3a/XL (experimental)
+  * Thanks to [gheron772](https://github.com/gheron772/Pixel3aVoLTE) for revealing many things with regard to VoLTE activation for Pixel 3a/XL!
+
 #### v1.02-20191218
 * Reduce code duplication and clean up
 
