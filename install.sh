@@ -200,6 +200,8 @@ on_install() {
   cp "${MBNDIR}/${LISTFILE}" "$MODPATH_LIST"
   
   ui_print "- Adding mcfg_sw.mbn paths to mbn_sw.txt"
+  # Add a newline at the end of mbn_sw.txt ONLY IF NOT EXISTS
+  [ $( tail -c 1 "$MODPATH_LIST" | wc -l ) -gt 0 ] || echo >> "$MODPATH_LIST"
   # Add each path to mcfg_sw.mbn at the end of mbn_sw.txt
   #           ONLY IF the path is NOT EXIST in mbn_sw.txt
   local MBNFILE
