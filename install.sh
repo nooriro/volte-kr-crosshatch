@@ -128,7 +128,7 @@ print_modname() {
   ui_print "|         K   R for          |"
   ui_print "|         Pixel 3/XL         |"
   ui_print "|                            |"
-  ui_print "|       v1.03-20200214       |"
+  ui_print "|       v1.04-20210314       |"
   ui_print "|         by nooriro         |"
   ui_print "|                            |"
   ui_print "+----------------------------+"

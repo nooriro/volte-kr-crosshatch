@@ -79,6 +79,10 @@ Note that uninstalling only this module does not deactivate VoLTE on KR carriers
 
 ## Update History
 
+#### v1.04-20210314
+* Fix for no newline at end of mbn_sw.txt
+  * Thanks: [따이따잇](https://m.cafe.naver.com/ca-fe/web/cafes/25301658/articles/332847/comments?search.clubid=25301658&search.articleid=332847&search.refcommentid=49484199&search.commentid=49484199&search.menuid=728&search.focus=true&search.showCafeHome=true&search.perPage=5#focusing)
+
 #### v1.03-20200214
 * Support Pixel 3a/XL (experimental)
   * Thanks to [gheron772](https://github.com/gheron772/Pixel3aVoLTE) for revealing many things with regard to VoLTE activation for Pixel 3a/XL!
