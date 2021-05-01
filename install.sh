@@ -134,16 +134,6 @@ print_modname() {
   ui_print "+----------------------------+"
 }
 
-# Some modification of grep_prop() in util_functions.sh
-# https://github.com/topjohnwu/Magisk/blob/v20.1/scripts/util_functions.sh#L46
-
-my_grep_prop() {
-  local REGEX="s/^$1=//p"
-  shift
-  local FILES=$@
-  [ -z "$FILES" ] && FILES='/system/build.prop /vendor/build.prop /product/build.prop'
-  sed -n "$REGEX" $FILES 2>/dev/null | head -n 1
-}
 
 # Copy/extract your module files into $MODPATH in on_install.
 
@@ -152,12 +142,9 @@ on_install() {
   # Extend/change the logic to whatever you want
   
   # Get device information
-  local MANUFACTURER="$(my_grep_prop 'ro\.product\.manufacturer')"
-  local        MODEL="$(my_grep_prop 'ro\.product\.model'       )"
-  local       DEVICE="$(my_grep_prop 'ro\.product\.device'      )"
-  [ -z "$MANUFACTURER" ] && MANUFACTURER="$(my_grep_prop 'ro\.product\.vendor\.manufacturer')"
-  [ -z "$MODEL"        ] &&        MODEL="$(my_grep_prop 'ro\.product\.vendor\.model'       )"
-  [ -z "$DEVICE"       ] &&       DEVICE="$(my_grep_prop 'ro\.product\.vendor\.device'      )"
+  local MANUFACTURER="$(getprop ro.product.manufacturer)"
+  local        MODEL="$(getprop ro.product.model       )"
+  local       DEVICE="$(getprop ro.product.device      )"
   
   # Set $MBNTYPE
   local MBNTYPE
